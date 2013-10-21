@@ -5,4 +5,4 @@ book
 
 目前代码基本都是java风格, 下一步, 规划代码, 和假如新的功能, 服务端地址
 
-[book](https://github.com/mjason/book/)
+[book](https://github.com/mjason/best_library)
