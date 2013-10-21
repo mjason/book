@@ -1,0 +1,39 @@
+buildscript {
+    ext.kotlin_version = '0.6.+'
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.6.+'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$ext.kotlin_version"
+    }
+}
+apply plugin: 'android'
+apply plugin: 'kotlin-android'
+
+repositories {
+    mavenCentral()
+    maven {
+        url "https://raw.github.com/embarkmobile/zxing-android-minimal/mvn-repo/maven-repository/"
+    }
+}
+
+android {
+    compileSdkVersion 16
+    buildToolsVersion "18.0.1"
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 16
+    }
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$ext.kotlin_version"
+    compile 'com.embarkmobile:zxing-android-minimal:1.1.4@aar'
+    compile "com.loopj.android:android-async-http:1.4.3@jar"
+    compile fileTree(dir: 'libs', include: '*.jar')
+}
