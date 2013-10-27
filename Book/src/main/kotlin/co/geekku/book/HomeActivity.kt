@@ -20,6 +20,11 @@ import android.widget.ArrayAdapter
 import android.util.Log
 import java.util.ArrayList
 import co.geekku.book.model.baseUrl
+import co.geekku.book.model.*
+import android.app.ProgressDialog
+import org.apache.http.conn.HttpHostConnectException
+import org.apache.http.conn.ConnectTimeoutException
+import co.geekku.libs.*
 
 public open class HomeActivity() : Activity() {
 
@@ -38,24 +43,36 @@ public open class HomeActivity() : Activity() {
 
         val listView = findViewById(R.id.listView) as ListView
         val listArray = ArrayList<String>()
+        val progressDialog = ProgressDialog.show(this@HomeActivity, "温馨提醒", "获取数据中...", true, false)
 
         client.get(
                 this,
                 "${baseUrl}/api/v1/books.json?token=${token}",
-                object: JsonHttpResponseHandler() {
-                    override public fun onSuccess(resp: JSONArray?) {
-                        if(resp!!.length() == 0) {
-                            return
-                        }
-                        for (i in 0..resp!!.length().minus(1)) {
-                            listArray.add(resp!!.getJSONObject(i)?.getString("name")!!)
-                            Log.i("array", listArray.size.toString())
-                        }
+                JSONResponseHandler<JSONArray, JSONObject>(
+                        {
+                            progressDialog.dismiss()
+                            it.foreach {
+                                listArray.add(it.getString("name")!!)
+                            }
 
-                        val arrayAdpter = ArrayAdapter(this@HomeActivity, android.R.layout.simple_expandable_list_item_1, listArray)
-                        listView.setAdapter(arrayAdpter)
-                    }
-                }
+                            val arrayAdpter = ArrayAdapter(this@HomeActivity, android.R.layout.simple_expandable_list_item_1, listArray)
+                            listView.setAdapter(arrayAdpter)
+                        },
+                        { e, res ->
+                            progressDialog.dismiss()
+                            when (e) {
+                                is HttpHostConnectException -> {
+                                    Toast.makeText(this@HomeActivity, "无法连接", Toast.LENGTH_SHORT).show()
+                                }
+                                is ConnectTimeoutException -> {
+                                    Toast.makeText(this@HomeActivity, "连接超时", Toast.LENGTH_SHORT).show()
+                                }
+                                else -> {
+                                    Toast.makeText(this@HomeActivity, res?.getString("error"), Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
+                )
         )
     }
 
@@ -81,6 +98,7 @@ public open class HomeActivity() : Activity() {
         super.onActivityResult(requestCode, resultCode, data)
 
         if(resultCode == Activity.RESULT_OK) {
+            val progressDialog = ProgressDialog.show(this@HomeActivity, "温馨提醒", "添加图书中...", true, false)
             val bundle = data.getExtras()
             val scanResult = bundle?.getString("SCAN_RESULT")
             val params = RequestParams()
@@ -89,13 +107,28 @@ public open class HomeActivity() : Activity() {
                     this,
                     "${baseUrl}/api/v1/books.json?token=${token}",
                     params,
-                    object: JsonHttpResponseHandler() {
-                        override public fun onSuccess(resp: JSONObject?) {
-                            val message = resp?.getString("message")
-                            Toast.makeText(this@HomeActivity, message, Toast.LENGTH_SHORT).show()
-                            relaodListView()
-                        }
-                    }
+                    JSONResponseHandler<JSONObject, JSONObject>(
+                            {
+                                progressDialog.dismiss()
+                                val message = it?.getString("message")
+                                Toast.makeText(this@HomeActivity, message, Toast.LENGTH_SHORT).show()
+                                relaodListView()
+                            },
+                            { e, res ->
+                                progressDialog.dismiss()
+                                when (e) {
+                                    is HttpHostConnectException -> {
+                                        Toast.makeText(this@HomeActivity, "无法连接", Toast.LENGTH_SHORT).show()
+                                    }
+                                    is ConnectTimeoutException -> {
+                                        Toast.makeText(this@HomeActivity, "连接超时", Toast.LENGTH_SHORT).show()
+                                    }
+                                    else -> {
+                                        Toast.makeText(this@HomeActivity, res?.getString("error"), Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            }
+                    )
             )
         }
     }

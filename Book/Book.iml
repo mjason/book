@@ -70,11 +70,11 @@
     </content>
     <orderEntry type="jdk" jdkName="Android API 16 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" exported="" name="kotlin-stdlib-0.6.602" level="project" />
     <orderEntry type="library" exported="" name="android-async-http-1.4.3" level="project" />
     <orderEntry type="library" exported="" name="ComEmbarkmobileZxingAndroidMinimal114.aar" level="project" />
+    <orderEntry type="library" exported="" name="kotlin-runtime-0.6.602" level="project" />
     <orderEntry type="library" exported="" name="zxing_core" level="project" />
-    <orderEntry type="library" exported="" name="kotlin-runtime-0.6.800" level="project" />
-    <orderEntry type="library" exported="" name="kotlin-stdlib-0.6.800" level="project" />
   </component>
 </module>
 
